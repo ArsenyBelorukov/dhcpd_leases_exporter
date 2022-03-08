@@ -1,7 +1,7 @@
 package collectors
 
 import (
-	"github.com/DRuggeri/dhcpdleasesreader"
+	"github.com/ArsenyBelorukov/dhcpd_leases_exporter/dhcpdleasesreader"
 	"github.com/prometheus/client_golang/prometheus"
 	"sync"
 	"time"

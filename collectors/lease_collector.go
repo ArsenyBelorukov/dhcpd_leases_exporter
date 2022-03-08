@@ -1,10 +1,11 @@
 package collectors
 
 import (
-	"github.com/DRuggeri/dhcpdleasesreader"
-	"github.com/prometheus/client_golang/prometheus"
 	"sync"
 	"time"
+
+	"github.com/ArsenyBelorukov/dhcpd_leases_exporter/dhcpdleasesreader"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type leaseCollector struct {
@@ -22,7 +23,7 @@ type leaseCollector struct {
 func NewLeaseCollector(namespace string, info *dhcpdleasesreader.DhcpdInfo, mux *sync.Mutex) *leaseCollector {
 	activeDesc := prometheus.NewDesc(prometheus.BuildFQName(namespace, "active", "client"),
 		"The number of leases in dhcpd.leases that have not yet expired",
-		[]string{"hostname", "ip", "mac"}, nil,
+		[]string{"hostname", "ip", "mac", "uid"}, nil,
 	)
 
 	scrapesTotalMetric := prometheus.NewCounter(
@@ -88,10 +89,9 @@ func (c *leaseCollector) Collect(ch chan<- prometheus.Metric) {
 
 	for address, lease := range c.info.Leases {
 		if begun.Before(lease.Ends) {
-			ch <- prometheus.MustNewConstMetric(c.activeDesc, prometheus.GaugeValue, float64(1), lease.Hostname, address, lease.Hardware_address)
+			ch <- prometheus.MustNewConstMetric(c.activeDesc, prometheus.GaugeValue, float64(lease.Ends.Unix()), lease.Hostname, address, lease.Hardware_address, lease.Uid)
 		}
 	}
-
 	ch <- c.scrapesTotalMetric
 	ch <- c.scrapeErrorsTotalMetric
 	ch <- prometheus.MustNewConstMetric(c.lastScrapeErrorDesc, prometheus.GaugeValue, float64(err_num))

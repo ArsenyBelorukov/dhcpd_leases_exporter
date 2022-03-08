@@ -13,9 +13,9 @@ import (
 	"github.com/prometheus/common/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/DRuggeri/dhcpd_leases_exporter/collectors"
-	"github.com/DRuggeri/dhcpd_leases_exporter/filters"
-	"github.com/DRuggeri/dhcpdleasesreader"
+	"github.com/ArsenyBelorukov/dhcpd_leases_exporter/collectors"
+	"github.com/ArsenyBelorukov/dhcpd_leases_exporter/dhcpdleasesreader"
+	"github.com/ArsenyBelorukov/dhcpd_leases_exporter/filters"
 )
 
 var Version string
@@ -102,7 +102,7 @@ func main() {
 	kingpin.Parse()
 
 	var mux = &sync.Mutex{}
-	info, err := dhcpdleasesreader.NewDhcpdInfo(*dhcpdLeasesFile, false)
+	info, err := dhcpdleasesreader.NewDhcpdInfo(*dhcpdLeasesFile, true)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
